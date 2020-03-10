@@ -11,7 +11,7 @@ with open('Facial_recognition_test_1.0/credentials.csv', 'r') as input:
         secret_access_key = line[3]
 
 
-#photo = 'Facial_recognition_test_1.0/detect-analyze-faces-rekognition-sample1.jpg'
+photo = 'detect-analyze-faces-rekognition-sample1.jpg'
 
 # Read image as bytes
 #with open(photo, 'rb') as source_image:
@@ -22,9 +22,29 @@ with open('Facial_recognition_test_1.0/credentials.csv', 'r') as input:
 client = boto3.client('rekognition', aws_access_key_id = access_key_id, aws_secret_access_key = secret_access_key, region_name="eu-west-1")
 
 # run rekogniton on image in S3 bucket
-response = client.detect_labels(Image={'S3Object': {
-            'Bucket': 'mix250-bt',
-            'Name': 'detect-analyze-faces-rekognition-sample1.jpg'
-        }}, MaxLabels=5, MinConfidence=95)
+# recognize labels
+#response_labels = client.detect_labels(Image={'S3Object': {
+#            'Bucket': 'mix250-bt',
+#            'Name': photo
+#        }}, MaxLabels=10, MinConfidence=90)
 
-print(response)
+# recognize faces
+response_faces = client.detect_faces(
+    Image={
+        'S3Object': {
+            'Bucket': 'mix250-bt',
+            'Name': photo
+            }
+    },
+    Attributes=[
+        'ALL',
+    ]
+    )
+
+#print(response)
+
+for key, value in response_faces.items():
+    if key == 'FaceDetails':
+        for people__att in value:
+            print(people__att)
+            print("- - -")
